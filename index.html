@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthSaathi AI - Free Health Guidance</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    min-height: 100vh;
+    color: white;
+  }
+  .header {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .logo { font-size: 2rem; }
+  .header-text h1 { font-size: 1.3rem; font-weight: 700; }
+  .header-text p { font-size: 0.75rem; color: #4ade80; }
+  .badge {
+    margin-left: auto;
+    background: #4ade80;
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .container { max-width: 700px; margin: 0 auto; padding: 1.5rem; }
+  .symptoms-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .sym-btn {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 12px;
+    cursor: pointer;
+    text-align: left;
+    color: white;
+    transition: all 0.2s;
+  }
+  .sym-btn:hover { background: rgba(74,222,128,0.15); border-color: #4ade80; }
+  .sym-btn .icon { font-size: 1.4rem; margin-bottom: 4px; }
+  .sym-btn .name { font-size: 13px; font-weight: 600; }
+  .sym-btn .desc { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .chat-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 1rem;
+    min-height: 200px;
+    max-height: 350px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+  }
+  .msg {
+    margin-bottom: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .msg.user { flex-direction: row-reverse; }
+  .msg-bubble {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .msg.bot .msg-bubble {
+    background: rgba(74,222,128,0.15);
+    border: 1px solid rgba(74,222,128,0.3);
+    color: #e2ffe8;
+  }
+  .msg.user .msg-bubble {
+    background: rgba(99,102,241,0.3);
+    border: 1px solid rgba(99,102,241,0.4);
+  }
+  .msg-avatar { font-size: 1.2rem; flex-shrink: 0; }
+  .input-row {
+    display: flex;
+    gap: 8px;
+  }
+  .input-row input {
+    flex: 1;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: white;
+    font-size: 14px;
+    outline: none;
+  }
+  .input-row input::placeholder { color: rgba(255,255,255,0.35); }
+  .input-row input:focus { border-color: #4ade80; }
+  .send-btn {
+    background: #4ade80;
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  .send-btn:hover { background: #22c55e; }
+  .disclaimer {
+    margin-top: 1rem;
+    padding: 10px 14px;
+    background: rgba(251,191,36,0.1);
+    border: 1px solid rgba(251,191,36,0.3);
+    border-radius: 10px;
+    font-size: 11px;
+    color: #fbbf24;
+    text-align: center;
+  }
+  .section-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+  .emergency-btn {
+    width: 100%;
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(239,68,68,0.4);
+    color: #fca5a5;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .emergency-btn:hover { background: rgba(239,68,68,0.25); }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">🩺</div>
+  <div class="header-text">
+    <h1>HealthSaathi AI</h1>
+    <p>Free Health Guidance • 24/7 Available</p>
+  </div>
+  <div class="badge">FREE</div>
+</div>
+
+<div class="container">
+
+  <button class="emergency-btn" onclick="emergency()">
+    🚨 Emergency? Call 112 Now — Ambulance Free Hai
+  </button>
+
+  <div class="section-label">COMMON SYMPTOMS — SELECT KARO YA NEECHE LIKHO</div>
+
+  <div class="symptoms-grid">
+    <button class="sym-btn" onclick="quickAsk('Mujhe bukhaar hai aur sar dard ho raha hai')">
+      <div class="icon">🌡️</div>
+      <div class="name">Bukhaar / Fever</div>
+      <div class="desc">Sar dard, thakaan</div>
+    </button>
+    <button class="sym-btn" onclick="quickAsk('Mera pet dard kar raha hai aur ulti aa rahi hai')">
+      <div class="icon">🤢</div>
+      <div class="name">Pet Dard / Ulti</div>
+      <div class="desc">Nausea, stomach pain</div>
+    </button>
+    <button class="sym-btn" onclick="quickAsk('Mujhe khansi aur saans lene mein takleef ho rahi hai')">
+      <div class="icon">😷</div>
+      <div class="name">Khansi / Saans</div>
+      <div class="desc">Cold, cough, breathing</div>
+    </button>
+    <button class="sym-btn" onclick="quickAsk('Mera sar bahut dard kar raha hai')">
+      <div class="icon">🤕</div>
+      <div class="name">Sar Dard</div>
+      <div class="desc">Headache, migraine</div>
+    </button>
+    <button class="sym-btn" onclick="quickAsk('Mujhe seene mein dard ho raha hai')">
+      <div class="icon">💔</div>
+      <div class="name">Seene Mein Dard</div>
+      <div class="desc">Chest pain</div>
+    </button>
+    <button class="sym-btn" onclick="quickAsk('Mujhe bahut kamzori aur chakkar aa rahe hain')">
+      <div class="icon">😵</div>
+      <div class="name">Kamzori / Chakkar</div>
+      <div class="desc">Weakness, dizziness</div>
+    </button>
+    <button class="sym-btn" onclick="quickAsk('Meri neend nahi aa rahi hai')">
+      <div class="icon">😴</div>
+      <div class="name">Neend Nahi</div>
+      <div class="desc">Insomnia, stress</div>
+    </button>
+    <button class="sym-btn" onclick="quickAsk('Mujhe sugar ya BP ki problem hai')">
+      <div class="icon">💉</div>
+      <div class="name">Sugar / BP</div>
+      <div class="desc">Diabetes, blood pressure</div>
+    </button>
+  </div>
+
+  <div class="chat-box" id="chatBox">
+    <div class="msg bot">
+      <div class="msg-avatar">🩺</div>
+      <div class="msg-bubble">
+        Namaste! Main HealthSaathi AI hoon. 🙏<br><br>
+        Aap apna symptom ya health sawaal Hindi ya English mein likh sakte hain, ya upar buttons se select kar sakte hain.<br><br>
+        Main aapko guide karunga ki ghar pe rest karein, chemist pe jaayein, ya doctor se milein.
+      </div>
+    </div>
+  </div>
+
+  <div class="input-row">
+    <input type="text" id="userInput" placeholder="Apna symptom ya sawaal likhein..." onkeypress="if(event.key==='Enter') sendMsg()">
+    <button class="send-btn" onclick="sendMsg()">➤</button>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ Yeh AI guidance hai, doctor ki jagah nahi. Serious symptoms mein turant doctor se milein.
+  </div>
+
+</div>
+
+<script>
+const knowledge = {
+  bukhaar: {
+    keys: ['bukhaar','fever','temperature','bukhar','garmi','104','103','102','101'],
+    response: `🌡️ <b>Bukhaar (Fever) ke baare mein:</b><br><br>
+<b>Ghar pe kya karein:</b><br>
+• Paracetamol 500mg lein (Crocin/Dolo) — har 6 ghante<br>
+• Thanda paani ki patti maathey pe rakhein<br>
+• Zyada paani aur ORS peeyein<br>
+• Aaram karein, bahar mat jaayein<br><br>
+<b>Doctor ke paas kab jaayein:</b><br>
+• Bukhaar 103°F se zyada ho<br>
+• 3 din se zyada rahe<br>
+• Saath mein khansi ya sar dard bhi ho<br><br>
+<b>Emergency (112 call karein) agar:</b><br>
+• Bachchey ko 104°F+ bukhaar ho<br>
+• Behoshi ya fits aayein`
+  },
+  pet: {
+    keys: ['pet','stomach','ulti','vomit','dast','loose motion','diarrhea','nausea','acidity','gas'],
+    response: `🤢 <b>Pet ki Takleef ke baare mein:</b><br><br>
+<b>Ghar pe kya karein:</b><br>
+• ORS (Electral) paani mein ghol ke peeyein<br>
+• Halka khaana khayein — khichdi, toast, banana<br>
+• Spicy aur oily khaana bilkul band karein<br>
+• Acidity mein Gelusil ya Eno lein<br><br>
+<b>Doctor ke paas kab jaayein:</b><br>
+• Zyada ultiyan ho rahi hain<br>
+• Pet mein bahut tez dard ho<br>
+• Loose motion 24 ghante se zyada<br><br>
+<b>Emergency agar:</b><br>
+• Khoon aa raha ho<br>
+• Bachchey mein dehydration ke signs`
+  },
+  khansi: {
+    keys: ['khansi','cough','saans','cold','zukhaam','naak','throat','gala','chest','seena'],
+    response: `😷 <b>Khansi / Saans ki Takleef:</b><br><br>
+<b>Ghar pe kya karein:</b><br>
+• Garam paani mein namak daal ke gargle karein<br>
+• Steam lein — garam paani ki bhaap<br>
+• Shahad aur adrak ka kadha peeyein<br>
+• Sone ke waqt sar thoda upar rakhein<br><br>
+<b>Doctor ke paas kab jaayein:</b><br>
+• Khansi 1 hafte se zyada<br>
+• Saath mein bukhaar bhi ho<br>
+• Saans phoolne lage<br><br>
+<b>Emergency agar:</b><br>
+• Saans lena bahut mushkil ho<br>
+• Hont neele padne lagein`
+  },
+  sar: {
+    keys: ['sar dard','headache','migraine','sir','maatha','aankhein','dard'],
+    response: `🤕 <b>Sar Dard ke baare mein:</b><br><br>
+<b>Ghar pe kya karein:</b><br>
+• Andhere aur shaant kamre mein aaram karein<br>
+• Paani peeyein — dehydration bada reason hai<br>
+• Maathey pe thanda kapda rakhein<br>
+• Paracetamol ya Disprin lein<br>
+• Screen time kam karein<br><br>
+<b>Doctor ke paas kab jaayein:</b><br>
+• Sar dard baar baar aaye<br>
+• Aankhon ke saath dard ho<br>
+• Dawai se bhi theek na ho<br><br>
+<b>Emergency agar:</b><br>
+• Achanak bahut tez dard shuru ho<br>
+• Saath mein ulti aur aankhon mein andheraapan`
+  },
+  seena: {
+    keys: ['seena','chest','dil','heart','cardiac','seene mein','left side'],
+    response: `💔 <b>Seene ka Dard — SERIOUS hai:</b><br><br>
+⚠️ <b>Seene ka dard kabhi ignore mat karein!</b><br><br>
+<b>Turant 112 call karein agar:</b><br>
+• Left side mein dard ho<br>
+• Baayein haath mein dard jaaye<br>
+• Saans phooley<br>
+• Paseena aaye aur chakkar aayein<br><br>
+<b>Thoda halka dard ho toh:</b><br>
+• Baith jaayein, aaram karein<br>
+• Tight kapde dheelay karein<br>
+• Aspirin 325mg lein agar available ho<br><br>
+<b>Doctor se aaj hi milein —</b> seene ka dard wait nahi karta.`
+  },
+  chakkar: {
+    keys: ['chakkar','kamzori','weakness','dizzy','behoshi','faint','thakaan','tired'],
+    response: `😵 <b>Chakkar / Kamzori ke baare mein:</b><br><br>
+<b>Ghar pe kya karein:</b><br>
+• Seedha baith jaayein ya let jaayein<br>
+• ORS ya nimbu paani peeyein<br>
+• Kuch khayein — khali pet na rahein<br>
+• Dhoop mein mat jaayein abhi<br><br>
+<b>Reasons:</b><br>
+• BP low ho sakta hai<br>
+• Sugar low ho sakti hai<br>
+• Dehydration<br>
+• Anemia (khoon ki kami)<br><br>
+<b>Doctor ke paas kab jaayein:</b><br>
+• Baar baar chakkar aayein<br>
+• Saath mein seene mein dard ho`
+  },
+  neend: {
+    keys: ['neend','sleep','insomnia','raat','jaag','anxiety','tension','stress'],
+    response: `😴 <b>Neend ki Takleef ke baare mein:</b><br><br>
+<b>Ghar pe kya karein:</b><br>
+• Sone ka ek fixed time rakho — roz same time<br>
+• Sone se 1 ghante pehle phone band karein<br>
+• Kamra thanda aur andhera rakhein<br>
+• Raat ko chai/coffee bilkul mat peeyein<br>
+• Halka garam doodh peeyein sone se pehle<br><br>
+<b>Yoga / Exercise:</b><br>
+• Anulom vilom — 10 minute<br>
+• Subah walk — 30 minute<br><br>
+<b>Doctor ke paas kab jaayein:</b><br>
+• 2 hafte se zyada problem ho<br>
+• Din mein bhi neend aaye bahut zyada`
+  },
+  sugar: {
+    keys: ['sugar','diabetes','bp','blood pressure','insulin','metformin','glucometer'],
+    response: `💉 <b>Sugar / BP Management:</b><br><br>
+<b>Sugar (Diabetes) ke liye:</b><br>
+• Roz subah khaali pet glucometer se check karein<br>
+• Normal: 70-100 mg/dL (khaali pet)<br>
+• Meetha, maida, chawal kam karein<br>
+• Roz 30 minute walk zaroori<br>
+• Dawai kabhi band mat karein khud se<br><br>
+<b>BP ke liye:</b><br>
+• Normal: 120/80 mmHg<br>
+• Namak aur tel kam karein<br>
+• Stress manage karein<br>
+• Roz BP check karein<br><br>
+<b>Emergency:</b><br>
+• Sugar 50 se neeche — turant mithai/juice<br>
+• BP 180+ — turant doctor`
+  }
+};
+
+function getResponse(msg) {
+  const m = msg.toLowerCase();
+  for (const [key, data] of Object.entries(knowledge)) {
+    for (const kw of data.keys) {
+      if (m.includes(kw)) return data.response;
+    }
+  }
+  return `🩺 <b>Aapka sawaal samajh aaya:</b> "${msg}"<br><br>
+Is specific problem ke liye main aapko suggest karunga:<br><br>
+• <b>Agar halki takleef hai:</b> Ghar pe aaram karein, paani peeyein<br>
+• <b>Agar 2-3 din se hai:</b> Nearest clinic ya chemist se milein<br>
+• <b>Agar bahut tez dard ya takleef hai:</b> Turant doctor ke paas jaayein<br>
+• <b>Emergency mein:</b> 112 pe call karein — free hai<br><br>
+Aur detail mein batayein — jaise bukhaar hai, pet dard hai, khansi hai — toh main better guide kar sakta hoon. 🙏`;
+}
+
+function addMsg(text, type) {
+  const box = document.getElementById('chatBox');
+  const div = document.createElement('div');
+  div.className = `msg ${type}`;
+  div.innerHTML = `
+    <div class="msg-avatar">${type === 'bot' ? '🩺' : '👤'}</div>
+    <div class="msg-bubble">${text}</div>
+  `;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendMsg() {
+  const input = document.getElementById('userInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  addMsg(msg, 'user');
+  input.value = '';
+  setTimeout(() => addMsg(getResponse(msg), 'bot'), 600);
+}
+
+function quickAsk(msg) {
+  addMsg(msg, 'user');
+  setTimeout(() => addMsg(getResponse(msg), 'bot'), 600);
+}
+
+function emergency() {
+  addMsg('Emergency help chahiye!', 'user');
+  setTimeout(() => addMsg(`🚨 <b>EMERGENCY — TURANT KAREIN:</b><br><br>
+📞 <b>112</b> — Police / Ambulance / Fire (FREE)<br>
+🏥 <b>108</b> — Ambulance (FREE)<br>
+💊 <b>104</b> — Health Helpline (FREE)<br><br>
+<b>Nearest hospital jaayein ABHI.</b><br>
+Kisi bhi government hospital mein emergency FREE treatment milti hai.`, 'bot'), 400);
+}
+</script>
+</body>
+  </html>
